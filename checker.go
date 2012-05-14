@@ -5,17 +5,37 @@ package main
 import "fmt"
 import "io/ioutil"
 import "os"
+import "flag"
 
 func main() {
-    fmt.Println("Hello, ..")
-    files, err := ioutil.ReadDir(".")
+    flag.Parse()
+
+    checksums := FileChecksums(flag.Arg(0))
+    for k, v := range checksums {
+        fmt.Printf( "The checksum of %s is %s\n", k, v)
+    }
+}
+
+func FileChecksums(dir string) map[string]string {
+    files, err := ioutil.ReadDir(dir)
     if err != nil {
         fmt.Print(err)
         os.Exit(1)
     }
-    for i := 0; i < len(files); i++ {
-        fmt.Printf("%s\n", files[i].Name())
-    }
-    os.Exit(0)
-}
+    hashes := make(map[string]string)
+    hash := "abcdef"
 
+
+    for i := 0; i < len(files); i++ {
+        fullpath := dir + "/" + files[i].Name()
+        if files[i].IsDir() {
+            for k, v := range FileChecksums(fullpath) {
+                hashes[k] = v
+            }
+        } else {
+            hashes[fullpath] = hash
+        }
+    }
+
+    return hashes
+}
