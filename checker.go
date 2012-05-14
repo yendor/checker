@@ -4,11 +4,13 @@ package main
 
 import "fmt"
 import "io/ioutil"
-import "os"
+//import "os"
 import "flag"
 
 func main() {
     flag.Parse()
+
+    // TODO: Make sure the supplied argument is a directory
 
     checksums := FileChecksums(flag.Arg(0))
     for k, v := range checksums {
@@ -19,8 +21,7 @@ func main() {
 func FileChecksums(dir string) map[string]string {
     files, err := ioutil.ReadDir(dir)
     if err != nil {
-        fmt.Print(err)
-        os.Exit(1)
+        panic(err)
     }
     hashes := make(map[string]string)
     hash := "abcdef"
@@ -33,6 +34,7 @@ func FileChecksums(dir string) map[string]string {
                 hashes[k] = v
             }
         } else {
+            // TODO: Calculate the hash of the file
             hashes[fullpath] = hash
         }
     }
