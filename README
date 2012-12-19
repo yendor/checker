@@ -1,3 +1,5 @@
-Checker is a program for identifying bitrot on long term storage.
+Checker is multiple implementations of running a hash algorithm over a directory tree of files.
 
-It's my first go project so all suggestions for improvement are welcome.
+It's designed to compare the performance of multiple different approaches to this problem.
+
+Currently it's using md5.
