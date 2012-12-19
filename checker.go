@@ -15,43 +15,44 @@ func main() {
 
     start := flag.Arg(0)
 
-    stat, err := os.Stat(start)
+    _, err := os.Stat(start)
     if err != nil {
         usage();
         os.Exit(1);
         panic(err)
     }
 
-    if (stat.IsDir()) {
-        FileChecksums(flag.Arg(0))
-    } else {
-        usage();
-    }
+    FileChecksums(flag.Arg(0))
 }
 
 func FileChecksums(dir string) {
-    _, err := os.Stat(dir)
-    if err != nil {
-        panic(err)
-    }
-
-    files, err := ioutil.ReadDir(dir)
-
+    stat, err := os.Stat(dir)
     if err != nil {
         panic(err)
     }
 
     hash := "abcdef"
 
-    for i := 0; i < len(files); i++ {
-        fullpath := dir + "/" + files[i].Name()
+    if (stat.IsDir()) {
+        files, err := ioutil.ReadDir(dir)
 
-        if files[i].IsDir() {
-            FileChecksums(fullpath);
-        } else {
-            hash = GetFileHash(fullpath)
-            fmt.Printf( "%s  %s\n", hash, fullpath)
+        if err != nil {
+            panic(err)
         }
+
+        for i := 0; i < len(files); i++ {
+            fullpath := dir + "/" + files[i].Name()
+
+            if files[i].IsDir() {
+                FileChecksums(fullpath);
+            } else {
+                hash = GetFileHash(fullpath)
+                fmt.Printf( "%s  %s\n", hash, fullpath)
+            }
+        }
+    } else {
+        hash = GetFileHash(dir)
+        fmt.Printf( "%s  %s\n", hash, dir)
     }
 }
 
