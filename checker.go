@@ -8,14 +8,14 @@ import "os"
 import "flag"
 import "crypto/md5"
 import "io"
-//import "bytes"
+import "bytes"
+import "launchpad.net/gommap"
 
 func main() {
     flag.Parse()
 
     start := flag.Arg(0)
-
-    _, err := os.Stat(start)
+_, err := os.Stat(start)
     if err != nil {
         usage();
         os.Exit(1);
@@ -63,7 +63,16 @@ func GetFileHash(filepath string) string {
     defer fi.Close()
 
     running_hash := md5.New()
-    io.Copy(running_hash, fi)
+    //io.Copy(running_hash, fi)
+    mmap, err := gommap.Map(fi.Fd(), gommap.PROT_READ, gommap.MAP_PRIVATE)
+    if err != nil {
+        panic(err)
+    }
+    //mmapReader := bytes.NewReader(mmap)
+    //io.Copy(running_hash, mmapReader)
+    buf := bytes.NewBuffer(mmap)
+    io.Copy(running_hash, buf)
+
     return fmt.Sprintf("%x", running_hash.Sum(nil))
 }
 
